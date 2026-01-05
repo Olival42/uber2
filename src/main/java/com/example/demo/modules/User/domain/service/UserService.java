@@ -1,17 +1,19 @@
 package com.example.demo.modules.User.domain.service;
 
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.modules.User.adapter.mapper.UserMapper;
+import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
+import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterResponseDTO;
+import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
 import com.example.demo.modules.User.application.web.dto.UserResponseDTO;
-import com.example.demo.modules.User.domain.entity.AuthTokenDTO;
 import com.example.demo.modules.User.domain.entity.DriverEntity;
 import com.example.demo.modules.User.domain.entity.PassengerEntity;
 import com.example.demo.modules.User.domain.entity.UserEntity;
@@ -39,8 +41,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder encoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Transactional
-    public RegisterResponseDTO registerPassenger(RegisterPassengerDTO req) {
+    public AuthResponseDTO registerPassenger(RegisterPassengerDTO req) {
         PassengerEntity entity = mapper.toPassengerEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -50,14 +55,14 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(entity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
 
-        return RegisterResponseDTO.builder()
+        return AuthResponseDTO.builder()
                 .user(userResponse)
                 .tokens(tokens)
                 .build();
     }
 
     @Transactional
-    public RegisterResponseDTO registerDriver(RegisterDriverDTO req) {
+    public AuthResponseDTO registerDriver(RegisterDriverDTO req) {
         DriverEntity entity = mapper.toDriverEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -67,7 +72,24 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(entity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
 
-        return RegisterResponseDTO.builder()
+        return AuthResponseDTO.builder()
+                .user(userResponse)
+                .tokens(tokens)
+                .build();
+    }
+
+    public AuthResponseDTO loginUser(UserLoginDTO req) {
+        UsernamePasswordAuthenticationToken userNamePassword = new UsernamePasswordAuthenticationToken(req.getEmail(),
+                req.getPassword());
+
+        Authentication auth = this.authenticationManager.authenticate(userNamePassword);
+
+        UserEntity entity = (UserEntity) auth.getPrincipal();
+
+        AuthTokenDTO tokens = generateTokens(entity);
+        UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
+
+        return AuthResponseDTO.builder()
                 .user(userResponse)
                 .tokens(tokens)
                 .build();

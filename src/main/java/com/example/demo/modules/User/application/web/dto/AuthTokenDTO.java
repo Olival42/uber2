@@ -1,4 +1,4 @@
-package com.example.demo.modules.User.domain.entity;
+package com.example.demo.modules.User.application.web.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

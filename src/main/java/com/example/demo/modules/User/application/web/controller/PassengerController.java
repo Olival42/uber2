@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterResponseDTO;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 import com.example.demo.shared.ApiResponse;
 import com.example.demo.utils.CookieManager;
@@ -41,25 +41,25 @@ public class PassengerController {
         @PostMapping("/register")
         public ResponseEntity<ApiResponse<?>> postMethodName(@RequestBody @Valid RegisterPassengerDTO req,
                         UriComponentsBuilder uriBuilder) {
-                RegisterResponseDTO registerResponseDTO = service.registerPassenger(req);
+                AuthResponseDTO authResponseDTO = service.registerPassenger(req);
 
-                URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(registerResponseDTO.getUser().getId())
+                URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(authResponseDTO.getUser().getId())
                                 .toUri();
 
                 var tokens = Map.of(
-                                "accessToken", registerResponseDTO.getTokens().getAccessToken(),
-                                "expiresAt", registerResponseDTO.getTokens().getExpiresAt());
+                                "accessToken", authResponseDTO.getTokens().getAccessToken(),
+                                "expiresAt", authResponseDTO.getTokens().getExpiresAt());
 
                 ApiResponse<?> response = ApiResponse.builder()
                                 .success(true)
                                 .data(Map.of(
-                                                "user", registerResponseDTO.getUser(),
+                                                "user", authResponseDTO.getUser(),
                                                 "tokens", tokens))
                                 .error(null)
                                 .build();
 
-                ResponseCookie cookie = cookieManager.createRefreshCookie(registerResponseDTO.getTokens().getRefreshToken(),
-                                jwtService.getExpiresAt(registerResponseDTO.getTokens().getRefreshToken())
+                ResponseCookie cookie = cookieManager.createRefreshCookie(authResponseDTO.getTokens().getRefreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.getTokens().getRefreshToken())
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.created(url).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);

@@ -9,21 +9,20 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import jakarta.persistence.EntityNotFoundException;
-
-import org.springframework.web.bind.MethodArgumentNotValidException;
-
-import org.springframework.validation.FieldError;
 
 import com.example.demo.infrastructure.exception.security.InvalidTokenTypeException;
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.infrastructure.exception.security.TokenExpiredException;
 import com.example.demo.infrastructure.exception.security.TokenRevokedException;
-import com.example.demo.shared.*;
+import com.example.demo.shared.ApiResponse;
+import com.example.demo.shared.ErrorResponse;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -214,7 +213,7 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiResponse<?>> handleBadCredentials(BadCredentialsException ex) {
                 ErrorResponse error = ErrorResponse.builder()
                                 .code("BAD_CREDENTIALS")
-                                .message(ex.getMessage())
+                                .message("Credentials invalid")
                                 .build();
 
                 ApiResponse<?> response = ApiResponse.builder()
