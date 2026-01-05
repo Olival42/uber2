@@ -1,0 +1,11 @@
+package com.example.demo.modules.User.domain.repository;
+
+import java.util.UUID;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.example.demo.modules.User.domain.entity.DriverEntity;
+
+public interface IDriverRepository extends JpaRepository<DriverEntity, UUID>{
+
+}

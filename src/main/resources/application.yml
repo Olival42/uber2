@@ -23,16 +23,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-
-  redis:
-    host: ${REDIS_HOST}
-    port: ${PORT_REDIS}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${PORT_REDIS}
 
 server:
   port: ${API_PORT}
 
 jwt:
-  private.key: classpath:keys/private.pem
-  public.key: classpath:keys/public.pem
+  private.key: classpath:keys/private_key.pem
+  public.key: classpath:keys/public_key.pem
   access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
   refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
