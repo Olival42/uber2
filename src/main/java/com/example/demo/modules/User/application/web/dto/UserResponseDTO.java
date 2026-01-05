@@ -2,7 +2,7 @@ package com.example.demo.modules.User.application.web.dto;
 
 import java.time.Instant;
 
-import com.example.demo.modules.User.domain.UserRole;
+import com.example.demo.modules.User.domain.enums.UserRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

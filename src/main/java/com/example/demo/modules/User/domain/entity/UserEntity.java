@@ -9,7 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.demo.modules.User.domain.UserRole;
+import com.example.demo.modules.User.domain.enums.UserRole;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
