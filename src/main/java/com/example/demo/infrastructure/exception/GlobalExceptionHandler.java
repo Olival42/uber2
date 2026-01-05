@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import com.example.demo.infrastructure.exception.security.InvalidTokenException;
 import com.example.demo.infrastructure.exception.security.InvalidTokenTypeException;
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.infrastructure.exception.security.TokenExpiredException;
@@ -228,6 +229,36 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiResponse<?>> handleInvalidTokenType(InvalidTokenTypeException ex) {
                 ErrorResponse error = ErrorResponse.builder()
                                 .code("INVALID_TOKEN_TYPE")
+                                .message(ex.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        @ExceptionHandler(SecurityException.class)
+        public ResponseEntity<ApiResponse<?>> handleSecurityException(SecurityException er) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .code("SECURITY_EXCEPTION")
+                                .message(er.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        @ExceptionHandler(InvalidTokenException.class)
+        public ResponseEntity<ApiResponse<?>> handleInvalidToken(InvalidTokenException ex) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .code("INVALID_TOKEN")
                                 .message(ex.getMessage())
                                 .build();
 

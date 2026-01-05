@@ -1,18 +1,25 @@
 package com.example.demo.modules.User.infrastructure.security.service;
 
+import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.infrastructure.exception.security.InvalidTokenException;
+import com.example.demo.infrastructure.exception.security.InvalidTokenTypeException;
 import com.example.demo.modules.User.domain.entity.UserEntity;
 import com.example.demo.modules.User.infrastructure.security.config.JwtProperties;
+
+import io.jsonwebtoken.Jwts;
 
 @Service
 public class JwtService {
@@ -26,6 +33,9 @@ public class JwtService {
     @Autowired
     private JwtProperties jwtProperties;
 
+    @Value("${jwt.public.key}")
+    private RSAPublicKey publicKey;
+
     public String generateAccessToken(UserEntity user) {
         Instant now = Instant.now();
         long expiresAt = now.plus(jwtProperties.getAccessTokenExpiration()).getEpochSecond() - now.getEpochSecond();
@@ -36,7 +46,7 @@ public class JwtService {
                 .expiresAt(now.plusSeconds(expiresAt))
                 .subject(user.getEmail())
                 .claim("role", List.of(user.getRole().name()))
-                .claim("type", "refresh")
+                .claim("type", "access")
                 .build();
 
         return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -70,5 +80,46 @@ public class JwtService {
         }
 
         return jwt.getExpiresAt().getEpochSecond();
+    }
+
+    private String getTokenType(String token) {
+        Jwt jwt = decoder.decode(token);
+
+        var typeClaim = jwt.getClaims().get("type");
+        if (typeClaim == null) {
+            throw new IllegalStateException("Token doesn't have 'type' claim");
+        }
+
+        return typeClaim.toString();
+    }
+
+    private void validate(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(token);
+
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException("Invalid JWT token", e);
+        }
+    }
+
+    public void validateAccessToken(String token) {
+        validate(token);
+
+        String type = getTokenType(token);
+        if (!type.equals("access")) {
+            throw new InvalidTokenTypeException("Token isn't an access token");
+        }
+    }
+
+    public void validateRefreshToken(String token) {
+        validate(token);
+
+        String type = getTokenType(token);
+        if (!type.equals("refresh")) {
+            throw new InvalidTokenTypeException("Token isn't a refresh token");
+        }
     }
 }

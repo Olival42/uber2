@@ -16,7 +16,7 @@ public class CookieManager {
                                 .build();
     }
 
-    public ResponseCookie deleteRefreshCookie(String refreshToken, long expiresAt) {
+    public ResponseCookie deleteRefreshCookie() {
                 return ResponseCookie.from("refreshToken", "")
                                 .httpOnly(true)
                                 .secure(true)
