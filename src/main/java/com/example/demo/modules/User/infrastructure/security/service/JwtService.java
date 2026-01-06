@@ -93,33 +93,67 @@ public class JwtService {
         return typeClaim.toString();
     }
 
-    private void validate(String token) {
+    public boolean isAccessTokenValid(String token) {
         try {
             Jwts.parser()
                     .verifyWith(publicKey)
                     .build()
                     .parseSignedClaims(token);
 
+            String type = getTokenType(token);
+            return "access".equals(type);
+
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean isRefreshTokenValid(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(token);
+
+            String type = getTokenType(token);
+            return "refresh".equals(type);
+
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public void validateAccessTokenOrThrow(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(token);
+
+            String type = getTokenType(token);
+            if (!"access".equals(type)) {
+                throw new InvalidTokenTypeException("Token isn't an access token");
+            }
+
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidTokenException("Invalid JWT token", e);
         }
     }
 
-    public void validateAccessToken(String token) {
-        validate(token);
+    public void validateRefreshTokenOrThrow(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(token);
 
-        String type = getTokenType(token);
-        if (!type.equals("access")) {
-            throw new InvalidTokenTypeException("Token isn't an access token");
-        }
-    }
+            String type = getTokenType(token);
+            if (!"refresh".equals(type)) {
+                throw new InvalidTokenTypeException("Token isn't a refresh token");
+            }
 
-    public void validateRefreshToken(String token) {
-        validate(token);
-
-        String type = getTokenType(token);
-        if (!type.equals("refresh")) {
-            throw new InvalidTokenTypeException("Token isn't a refresh token");
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException("Invalid JWT token", e);
         }
     }
 }

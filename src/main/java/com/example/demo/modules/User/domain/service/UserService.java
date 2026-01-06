@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +22,7 @@ import com.example.demo.modules.User.domain.entity.PassengerEntity;
 import com.example.demo.modules.User.domain.entity.UserEntity;
 import com.example.demo.modules.User.domain.repository.IDriverRepository;
 import com.example.demo.modules.User.domain.repository.IPassengerRepository;
+import com.example.demo.modules.User.infrastructure.security.service.AuthContextService;
 import com.example.demo.modules.User.infrastructure.security.service.BlacklistService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 
@@ -51,6 +51,9 @@ public class UserService {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private AuthContextService authContextService;
 
     @Transactional
     public AuthResponseDTO registerPassenger(RegisterPassengerDTO req) {
@@ -104,21 +107,20 @@ public class UserService {
     }
 
     @Transactional
-    public void logoutUser(String refreshToken) {
+    public void logoutUser(String accessToken, String refreshToken) {
 
-        if (refreshToken.isBlank()) {
+        if (refreshToken.isBlank() || accessToken.isBlank()) {
             throw new MissingTokenException("Tokens must not be null");
         }
 
-        jwtService.validateRefreshToken(refreshToken);
-
-        String userFromContext = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        if (!jwtService.getSubject(refreshToken).equals(userFromContext)) {
-            throw new SecurityException("Invalid refresh token");
-        }
+        authContextService.validateRefreshTokenOwnership(refreshToken);
 
         long ttlRefresh = jwtService.getExpiresAt(refreshToken) - Instant.now().getEpochSecond();
+        long ttlAccess = jwtService.getExpiresAt(accessToken) - Instant.now().getEpochSecond();
+
+        if (!blacklistService.isTokenBlacklisted(accessToken) && ttlAccess > 0) {
+            blacklistService.blacklistToken(accessToken, ttlAccess);
+        }
 
         if (!blacklistService.isTokenBlacklisted(refreshToken) && ttlRefresh > 0) {
             blacklistService.blacklistToken(refreshToken, ttlRefresh);

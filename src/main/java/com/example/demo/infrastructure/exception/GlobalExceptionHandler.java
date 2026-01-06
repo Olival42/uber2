@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import com.example.demo.infrastructure.exception.security.InsufficientAuthenticationException;
 import com.example.demo.infrastructure.exception.security.InvalidTokenException;
 import com.example.demo.infrastructure.exception.security.InvalidTokenTypeException;
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
@@ -259,6 +260,21 @@ public class GlobalExceptionHandler {
         public ResponseEntity<ApiResponse<?>> handleInvalidToken(InvalidTokenException ex) {
                 ErrorResponse error = ErrorResponse.builder()
                                 .code("INVALID_TOKEN")
+                                .message(ex.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        @ExceptionHandler(InsufficientAuthenticationException.class)
+        public ResponseEntity<ApiResponse<?>> handleInsufficientAuthentication(InsufficientAuthenticationException ex) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .code("INSUFFICIENT_AUTHENTICATION")
                                 .message(ex.getMessage())
                                 .build();
 

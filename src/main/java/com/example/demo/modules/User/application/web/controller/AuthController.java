@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,53 +27,66 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+        @Autowired
+        private UserService userService;
 
-    @Autowired
-    private JwtService jwtService;
+        @Autowired
+        private JwtService jwtService;
 
-    @Autowired
-    private CookieManager cookieManager;
+        @Autowired
+        private CookieManager cookieManager;
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> login(@RequestBody @Valid UserLoginDTO req) {
-        AuthResponseDTO authResponseDTO = userService.loginUser(req);
+        @PostMapping("/login")
+        public ResponseEntity<ApiResponse<?>> login(@RequestBody @Valid UserLoginDTO req) {
+                AuthResponseDTO authResponseDTO = userService.loginUser(req);
 
-        var tokens = Map.of(
-                "accessToken", authResponseDTO.getTokens().getAccessToken(),
-                "expiresAt", authResponseDTO.getTokens().getExpiresAt());
+                var tokens = Map.of(
+                                "accessToken", authResponseDTO.getTokens().getAccessToken(),
+                                "expiresAt", authResponseDTO.getTokens().getExpiresAt());
 
-        ApiResponse<?> response = ApiResponse.builder()
-                .success(true)
-                .data(Map.of(
-                        "user", authResponseDTO.getUser(),
-                        "tokens", tokens))
-                .error(null)
-                .build();
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of(
+                                                "user", authResponseDTO.getUser(),
+                                                "tokens", tokens))
+                                .error(null)
+                                .build();
 
-        ResponseCookie cookie = cookieManager.createRefreshCookie(
-                authResponseDTO.getTokens().getRefreshToken(),
-                jwtService.getExpiresAt(authResponseDTO.getTokens().getRefreshToken())
-                        - Instant.now().getEpochSecond());
+                ResponseCookie cookie = cookieManager.createRefreshCookie(
+                                authResponseDTO.getTokens().getRefreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.getTokens().getRefreshToken())
+                                                - Instant.now().getEpochSecond());
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
-    }
+                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
+        }
 
-    @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<?>> logout(
-            @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+        @PostMapping("/logout")
+        public ResponseEntity<ApiResponse<?>> logout(
+                        @CookieValue(value = "refreshToken", required = false) String refreshToken,
+                        @RequestHeader(name = HttpHeaders.AUTHORIZATION, required = false) String header) {
 
-        userService.logoutUser(refreshToken);
+                if (refreshToken == null && header == null) {
+                        return ResponseEntity.ok(
+                                        ApiResponse.builder()
+                                                        .success(true)
+                                                        .data(Map.of("message", "Already logged out"))
+                                                        .error(null)
+                                                        .build());
+                }
 
-        ApiResponse<?> response = ApiResponse.builder()
-                .success(true)
-                .data(Map.of("message", "Logout successful"))
-                .error(null)
-                .build();
+                if (header != null && !header.startsWith("Bearer ")) {
+                        String accessToken = header.replace("Bearer ", "");
+                        userService.logoutUser(accessToken, refreshToken);
+                }
 
-        ResponseCookie cookie = cookieManager.deleteRefreshCookie();
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of("message", "Logout successful"))
+                                .error(null)
+                                .build();
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
-    }
+                ResponseCookie cookie = cookieManager.deleteRefreshCookie();
+
+                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
+        }
 }
