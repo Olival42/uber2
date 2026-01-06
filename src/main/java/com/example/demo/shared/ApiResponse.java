@@ -2,6 +2,8 @@ package com.example.demo.shared;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
@@ -19,6 +21,7 @@ public class ApiResponse<T> {
     private ErrorResponse error;
 
     @Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private Instant timestamp = Instant.now();
 
 }

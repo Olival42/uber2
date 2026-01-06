@@ -4,6 +4,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
+import com.example.demo.modules.User.application.web.dto.DriverResponseDTO;
+import com.example.demo.modules.User.application.web.dto.PassengerResponseDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
 import com.example.demo.modules.User.application.web.dto.UserResponseDTO;
@@ -25,4 +27,8 @@ public interface UserMapper {
     PassengerEntity toPassengerEntity(RegisterPassengerDTO dto);
 
     UserResponseDTO toUserResponseDto(UserEntity entity);
+
+    DriverResponseDTO toDriverResponseDto(DriverEntity entity);
+
+    PassengerResponseDTO toPassengerResponseDto(PassengerEntity entity);
 }

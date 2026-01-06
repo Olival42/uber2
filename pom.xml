@@ -167,10 +167,10 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- OAuth2 Resource Server (JWT Support) -->
+        <!-- Jackson JSR310 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <!-- MapStruct -->

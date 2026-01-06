@@ -5,18 +5,20 @@ import java.time.Instant;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
 import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
+import com.example.demo.modules.User.application.web.dto.DriverResponseDTO;
+import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
+import com.example.demo.modules.User.domain.service.DriverService;
 import com.example.demo.modules.User.domain.service.UserService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 import com.example.demo.shared.ApiResponse;
@@ -29,7 +31,10 @@ import jakarta.validation.Valid;
 public class DriverController {
 
         @Autowired
-        private UserService service;
+        private UserService userService;
+
+        @Autowired
+        private DriverService driverService;
 
         @Autowired
         private JwtService jwtService;
@@ -38,9 +43,9 @@ public class DriverController {
         private CookieManager cookieManager;
 
         @PostMapping("/register")
-        public ResponseEntity<ApiResponse<?>> postMethodName(@RequestBody @Valid RegisterDriverDTO req,
+        public ResponseEntity<ApiResponse<?>> registerDriver(@RequestBody @Valid RegisterDriverDTO req,
                         UriComponentsBuilder uriBuilder) {
-                AuthResponseDTO authResponseDTO = service.registerDriver(req);
+                AuthResponseDTO authResponseDTO = userService.registerDriver(req);
 
                 URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(authResponseDTO.getUser().getId())
                                 .toUri();
@@ -63,6 +68,20 @@ public class DriverController {
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.created(url).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
+        }
+
+        @GetMapping("/me")
+        public ResponseEntity<ApiResponse<?>> getMyProfile() {
+
+                DriverResponseDTO driverResponseDTO = driverService.getDriverById();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of("driver", driverResponseDTO))
+                                .error(null)
+                                .build();
+
+                return ResponseEntity.ok(response);
         }
 
 }

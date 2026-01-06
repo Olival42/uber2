@@ -5,12 +5,12 @@ import java.time.Instant;
 import com.example.demo.modules.User.domain.enums.UserRole;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class UserResponseDTO {
 
     private String id;
