@@ -13,7 +13,7 @@ public class BlacklistService {
     private StringRedisTemplate redisTemplate;
 
     public void blacklistToken(String token, long expiresAt) {
-        redisTemplate.opsForValue().set(token, "blacklisted");
+        redisTemplate.opsForValue().setIfAbsent(token, "blacklisted");
         redisTemplate.expire(token, Duration.ofSeconds(expiresAt));
     }
 

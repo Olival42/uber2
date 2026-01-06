@@ -4,9 +4,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.example.demo.modules.User.domain.entity.UserEntity;
 
+@Repository
 public interface IUserRepository extends JpaRepository<UserEntity, UUID>{
     Optional<UserEntity> findByEmail(String email);
 }

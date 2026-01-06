@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
+import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
 import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
 import com.example.demo.modules.User.domain.service.UserService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
@@ -86,6 +88,35 @@ public class AuthController {
                                 .build();
 
                 ResponseCookie cookie = cookieManager.deleteRefreshCookie();
+
+                return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
+        }
+
+        @PostMapping("/refresh")
+        public ResponseEntity<ApiResponse<?>> refresh(
+                        @CookieValue(value = "refreshToken", required = false) String refreshToken) {
+
+                if (refreshToken == null || refreshToken.isBlank()) {
+                        throw new MissingTokenException("Refresh token must not be null");
+                }
+
+                AuthTokenDTO authResponseDTO = userService.refreshTokens(refreshToken);
+
+                var tokens = Map.of(
+                                "accessToken", authResponseDTO.getAccessToken(),
+                                "expiresAt", authResponseDTO.getExpiresAt());
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of(
+                                                "tokens", tokens))
+                                .error(null)
+                                .build();
+
+                ResponseCookie cookie = cookieManager.createRefreshCookie(
+                                authResponseDTO.getRefreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.getRefreshToken())
+                                                - Instant.now().getEpochSecond());
 
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
         }

@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
+import com.example.demo.infrastructure.exception.security.TokenRevokedException;
 import com.example.demo.modules.User.adapter.mapper.UserMapper;
 import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
 import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
@@ -22,6 +24,7 @@ import com.example.demo.modules.User.domain.entity.PassengerEntity;
 import com.example.demo.modules.User.domain.entity.UserEntity;
 import com.example.demo.modules.User.domain.repository.IDriverRepository;
 import com.example.demo.modules.User.domain.repository.IPassengerRepository;
+import com.example.demo.modules.User.domain.repository.IUserRepository;
 import com.example.demo.modules.User.infrastructure.security.service.AuthContextService;
 import com.example.demo.modules.User.infrastructure.security.service.BlacklistService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
@@ -36,6 +39,9 @@ public class UserService {
 
     @Autowired
     private IDriverRepository driverRepository;
+
+    @Autowired
+    private IUserRepository userRepository;
 
     @Autowired
     private UserMapper mapper;
@@ -106,7 +112,6 @@ public class UserService {
                 .build();
     }
 
-    @Transactional
     public void logoutUser(String accessToken, String refreshToken) {
 
         if (refreshToken.isBlank() || accessToken.isBlank()) {
@@ -125,6 +130,24 @@ public class UserService {
         if (!blacklistService.isTokenBlacklisted(refreshToken) && ttlRefresh > 0) {
             blacklistService.blacklistToken(refreshToken, ttlRefresh);
         }
+    }
+
+    public AuthTokenDTO refreshTokens(String refreshToken) {
+        jwtService.validateRefreshTokenOrThrow(refreshToken);
+
+        if (blacklistService.isTokenBlacklisted(refreshToken)) {
+            throw new TokenRevokedException("Refresh token is revoked");
+        }
+
+        String subject = jwtService.getSubject(refreshToken);
+
+        UserEntity entity = userRepository.findByEmail(subject)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        blacklistService.blacklistToken(refreshToken,
+                jwtService.getExpiresAt(refreshToken) - Instant.now().getEpochSecond());
+
+        return generateTokens(entity);
     }
 
     private AuthTokenDTO generateTokens(UserEntity entity) {
