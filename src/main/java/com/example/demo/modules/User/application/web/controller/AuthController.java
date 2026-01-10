@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
 import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
+import com.example.demo.modules.User.application.web.dto.UserForgotPasswordRequestDTO;
 import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
+import com.example.demo.modules.User.application.web.dto.UserResetPasswordRequestDTO;
 import com.example.demo.modules.User.domain.service.UserService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 import com.example.demo.shared.ApiResponse;
@@ -92,7 +94,7 @@ public class AuthController {
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
         }
 
-        @PostMapping("/refresh")
+        @PostMapping("/refresh-token")
         public ResponseEntity<ApiResponse<?>> refresh(
                         @CookieValue(value = "refreshToken", required = false) String refreshToken) {
 
@@ -119,5 +121,31 @@ public class AuthController {
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
+        }
+
+        @PostMapping("/forgot-password")
+        public ResponseEntity<ApiResponse<?>> forgotPassword(@RequestBody @Valid UserForgotPasswordRequestDTO req) {
+                userService.sendResetPasswordEmail(req.getEmail());
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of("message", "If the email exists, a reset link has been sent"))
+                                .error(null)
+                                .build();
+
+                return ResponseEntity.ok().body(response);
+        }
+
+        @PostMapping("/reset-password")
+        public ResponseEntity<ApiResponse<?>> resetPassword(@RequestBody @Valid UserResetPasswordRequestDTO req) {
+                userService.resetPassword(req.getToken(), req.getNewPassword());
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(true)
+                                .data(Map.of("message", "Password has been reset successfully"))
+                                .error(null)
+                                .build();
+
+                return ResponseEntity.ok().body(response);
         }
 }

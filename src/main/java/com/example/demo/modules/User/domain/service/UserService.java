@@ -1,6 +1,8 @@
 package com.example.demo.modules.User.domain.service;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,13 +23,16 @@ import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
 import com.example.demo.modules.User.application.web.dto.UserResponseDTO;
 import com.example.demo.modules.User.domain.entity.DriverEntity;
 import com.example.demo.modules.User.domain.entity.PassengerEntity;
+import com.example.demo.modules.User.domain.entity.ResetPasswordTokenEntity;
 import com.example.demo.modules.User.domain.entity.UserEntity;
 import com.example.demo.modules.User.domain.repository.IDriverRepository;
 import com.example.demo.modules.User.domain.repository.IPassengerRepository;
+import com.example.demo.modules.User.domain.repository.IResetPassowordRepository;
 import com.example.demo.modules.User.domain.repository.IUserRepository;
 import com.example.demo.modules.User.infrastructure.security.service.AuthContextService;
 import com.example.demo.modules.User.infrastructure.security.service.BlacklistService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
+import com.example.demo.shared.email.EmailService;
 
 import jakarta.transaction.Transactional;
 
@@ -42,6 +47,9 @@ public class UserService {
 
     @Autowired
     private IUserRepository userRepository;
+
+    @Autowired
+    private IResetPassowordRepository resetPassowordRepository;
 
     @Autowired
     private UserMapper mapper;
@@ -60,6 +68,9 @@ public class UserService {
 
     @Autowired
     private AuthContextService authContextService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Transactional
     public AuthResponseDTO registerPassenger(RegisterPassengerDTO req) {
@@ -148,6 +159,50 @@ public class UserService {
                 jwtService.getExpiresAt(refreshToken) - Instant.now().getEpochSecond());
 
         return generateTokens(entity);
+    }
+
+    @Transactional
+    public void sendResetPasswordEmail(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+
+            resetPassowordRepository.deleteByUserEmail(user.getEmail());
+
+            String token = UUID.randomUUID().toString();
+
+            String hashedToken = encoder.encode(token);
+
+            ResetPasswordTokenEntity resetTokenEntity = ResetPasswordTokenEntity.builder()
+                    .token(hashedToken)
+                    .userEmail(user.getEmail())
+                    .expiration(Instant.now().plus(Duration.ofMinutes(15)))
+                    .build();
+
+            resetPassowordRepository.save(resetTokenEntity);
+
+            String resetLink = "https://your-frontend-app.com/reset-password?token=" + token;
+
+            emailService.sendResetPasswordEmail(user.getEmail(), resetLink);
+        });
+    }
+
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        ResetPasswordTokenEntity resetTokenEntity = resetPassowordRepository.findValidToken(Instant.now())
+                .stream()
+                .filter(t -> encoder.matches(token, t.getToken()))
+                .findFirst()
+                .orElseThrow(() -> new MissingTokenException("Invalid or expired reset token"));
+
+        if (resetTokenEntity.getExpiration().isBefore(Instant.now())) {
+            throw new MissingTokenException("Reset token has expired");
+        }
+
+        UserEntity user = userRepository.findByEmail(resetTokenEntity.getUserEmail()).orElseThrow();
+
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+
+        resetPassowordRepository.delete(resetTokenEntity);
     }
 
     private AuthTokenDTO generateTokens(UserEntity entity) {
