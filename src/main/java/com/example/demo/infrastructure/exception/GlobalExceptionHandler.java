@@ -286,6 +286,21 @@ public class GlobalExceptionHandler {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
+        @ExceptionHandler(RouteNotFoundException.class)
+        public ResponseEntity<ApiResponse<?>> handleRouteNotFound(RouteNotFoundException ex) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .code("ROUTE_NOT_FOUND")
+                                .message(ex.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ApiResponse<?>> handleInternalServerError(Exception er) {
                 ErrorResponse error = ErrorResponse.builder()

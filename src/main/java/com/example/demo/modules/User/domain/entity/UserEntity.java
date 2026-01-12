@@ -33,8 +33,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Inheritance(strategy=InheritanceType.JOINED)
-@DiscriminatorColumn(name="user_type")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "user_type")
 public abstract class UserEntity implements UserDetails {
 
     @Id
@@ -54,7 +54,7 @@ public abstract class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private Boolean active = true;
 
     private Instant createdAt = Instant.now();

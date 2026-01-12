@@ -45,7 +45,7 @@ public class JwtService {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresAt))
                 .subject(user.getEmail())
-                .claim("role", List.of(user.getRole().name()))
+                .claim("roles", List.of(user.getRole().name()))
                 .claim("type", "access")
                 .build();
 
@@ -61,7 +61,6 @@ public class JwtService {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiresAt))
                 .subject(user.getEmail())
-                .claim("role", List.of(user.getRole().name()))
                 .claim("type", "refresh")
                 .build();
 
@@ -75,11 +74,23 @@ public class JwtService {
     public long getExpiresAt(String token) {
         Jwt jwt = decoder.decode(token);
 
-        if (jwt.getExpiresAt() == null) {
+        Instant expiresAt = jwt.getExpiresAt();
+        if (expiresAt == null) {
             throw new IllegalStateException("Token não possui campo 'exp'");
         }
 
-        return jwt.getExpiresAt().getEpochSecond();
+        return expiresAt.getEpochSecond();
+    }
+
+    public List<String> getRoles(String token) {
+        Jwt jwt = decoder.decode(token);
+
+        var rolesClaim = jwt.getClaims().get("roles");
+        if (rolesClaim == null) {
+            throw new InvalidTokenException("Token doesn't have 'roles' claim");
+        }
+
+        return (List<String>) rolesClaim; 
     }
 
     private String getTokenType(String token) {

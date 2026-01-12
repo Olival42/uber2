@@ -45,20 +45,20 @@ public class AuthController {
                 AuthResponseDTO authResponseDTO = userService.loginUser(req);
 
                 var tokens = Map.of(
-                                "accessToken", authResponseDTO.getTokens().getAccessToken(),
-                                "expiresAt", authResponseDTO.getTokens().getExpiresAt());
+                                "accessToken", authResponseDTO.tokens().accessToken(),
+                                "expiresAt", authResponseDTO.tokens().expiresAt());
 
                 ApiResponse<?> response = ApiResponse.builder()
                                 .success(true)
                                 .data(Map.of(
-                                                "user", authResponseDTO.getUser(),
+                                                "user", authResponseDTO.user(),
                                                 "tokens", tokens))
                                 .error(null)
                                 .build();
 
                 ResponseCookie cookie = cookieManager.createRefreshCookie(
-                                authResponseDTO.getTokens().getRefreshToken(),
-                                jwtService.getExpiresAt(authResponseDTO.getTokens().getRefreshToken())
+                                authResponseDTO.tokens().refreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.tokens().refreshToken())
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);
@@ -105,8 +105,8 @@ public class AuthController {
                 AuthTokenDTO authResponseDTO = userService.refreshTokens(refreshToken);
 
                 var tokens = Map.of(
-                                "accessToken", authResponseDTO.getAccessToken(),
-                                "expiresAt", authResponseDTO.getExpiresAt());
+                                "accessToken", authResponseDTO.accessToken(),
+                                "expiresAt", authResponseDTO.expiresAt());
 
                 ApiResponse<?> response = ApiResponse.builder()
                                 .success(true)
@@ -116,8 +116,8 @@ public class AuthController {
                                 .build();
 
                 ResponseCookie cookie = cookieManager.createRefreshCookie(
-                                authResponseDTO.getRefreshToken(),
-                                jwtService.getExpiresAt(authResponseDTO.getRefreshToken())
+                                authResponseDTO.refreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.refreshToken())
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);

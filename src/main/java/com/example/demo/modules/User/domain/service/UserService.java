@@ -78,15 +78,12 @@ public class UserService {
 
         entity.setPassword(encoder.encode(entity.getPassword()));
 
-        passengerRepository.save(entity);
+        var savedEntity = passengerRepository.save(entity);
 
-        AuthTokenDTO tokens = generateTokens(entity);
-        UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
+        AuthTokenDTO tokens = generateTokens(savedEntity);
+        UserResponseDTO userResponse = mapper.toUserResponseDto(savedEntity);
 
-        return AuthResponseDTO.builder()
-                .user(userResponse)
-                .tokens(tokens)
-                .build();
+        return new AuthResponseDTO(userResponse, tokens);
     }
 
     @Transactional
@@ -95,15 +92,12 @@ public class UserService {
 
         entity.setPassword(encoder.encode(entity.getPassword()));
 
-        driverRepository.save(entity);
+        var savedEntity = driverRepository.save(entity);
 
-        AuthTokenDTO tokens = generateTokens(entity);
-        UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
+        AuthTokenDTO tokens = generateTokens(savedEntity);
+        UserResponseDTO userResponse = mapper.toUserResponseDto(savedEntity);
 
-        return AuthResponseDTO.builder()
-                .user(userResponse)
-                .tokens(tokens)
-                .build();
+        return new AuthResponseDTO(userResponse, tokens);
     }
 
     public AuthResponseDTO loginUser(UserLoginDTO req) {
@@ -117,10 +111,7 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(entity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
 
-        return AuthResponseDTO.builder()
-                .user(userResponse)
-                .tokens(tokens)
-                .build();
+        return new AuthResponseDTO(userResponse, tokens);
     }
 
     public void logoutUser(String accessToken, String refreshToken) {
@@ -206,16 +197,12 @@ public class UserService {
     }
 
     private AuthTokenDTO generateTokens(UserEntity entity) {
-        AuthTokenDTO authTokenDTO = new AuthTokenDTO();
 
         String accessToken = jwtService.generateAccessToken(entity);
         String refreshToken = jwtService.generateRefreshToken(entity);
         long expiresAt = jwtService.getExpiresAt(accessToken);
 
-        authTokenDTO.setAccessToken(accessToken);
-        authTokenDTO.setRefreshToken(refreshToken);
-        authTokenDTO.setExpiresAt(expiresAt);
+        return new AuthTokenDTO(accessToken, refreshToken, expiresAt);
 
-        return authTokenDTO;
     }
 }

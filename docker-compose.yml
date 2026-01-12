@@ -62,6 +62,7 @@ services:
       PORT_SMTP: ${PORT_SMTP}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
+      OPENROUTE_API_KEY: ${OPENROUTE_API_KEY}
     networks:
       - spring-net
 

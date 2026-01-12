@@ -47,24 +47,24 @@ public class DriverController {
                         UriComponentsBuilder uriBuilder) {
                 AuthResponseDTO authResponseDTO = userService.registerDriver(req);
 
-                URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(authResponseDTO.getUser().getId())
+                URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(authResponseDTO.user().getId())
                                 .toUri();
 
                 var tokens = Map.of(
-                                "accessToken", authResponseDTO.getTokens().getAccessToken(),
-                                "expiresAt", authResponseDTO.getTokens().getExpiresAt());
+                                "accessToken", authResponseDTO.tokens().accessToken(),
+                                "expiresAt", authResponseDTO.tokens().expiresAt());
 
                 ApiResponse<?> response = ApiResponse.builder()
                                 .success(true)
                                 .data(Map.of(
-                                                "user", authResponseDTO.getUser(),
+                                                "user", authResponseDTO.user(),
                                                 "tokens", tokens))
                                 .error(null)
                                 .build();
 
                 ResponseCookie cookie = cookieManager.createRefreshCookie(
-                                authResponseDTO.getTokens().getRefreshToken(),
-                                jwtService.getExpiresAt(authResponseDTO.getTokens().getRefreshToken())
+                                authResponseDTO.tokens().refreshToken(),
+                                jwtService.getExpiresAt(authResponseDTO.tokens().refreshToken())
                                                 - Instant.now().getEpochSecond());
 
                 return ResponseEntity.created(url).header(HttpHeaders.SET_COOKIE, cookie.toString()).body(response);

@@ -21,7 +21,6 @@ public class ApiResponse<T> {
     private ErrorResponse error;
 
     @Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy'T'HH:mm:ss", timezone = "America/Sao_Paulo")
     private Instant timestamp = Instant.now();
-
 }

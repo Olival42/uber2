@@ -28,6 +28,9 @@ spring:
       host: ${REDIS_HOST}
       port: ${PORT_REDIS}
 
+  openroute:
+    api-key: ${OPENROUTE_API_KEY}
+
 server:
   port: ${API_PORT}
 
