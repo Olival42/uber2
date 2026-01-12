@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import com.example.demo.infrastructure.GeocodingNotFoundException;
 import com.example.demo.infrastructure.exception.security.InsufficientAuthenticationException;
 import com.example.demo.infrastructure.exception.security.InvalidTokenException;
 import com.example.demo.infrastructure.exception.security.InvalidTokenTypeException;
@@ -29,7 +30,7 @@ import jakarta.persistence.EntityNotFoundException;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
+        @ExceptionHandler(EntityNotFoundException.class)
         public ResponseEntity<ApiResponse<?>> handleEntityNotFound(EntityNotFoundException er) {
 
                 ErrorResponse error = ErrorResponse.builder()
@@ -299,6 +300,21 @@ public class GlobalExceptionHandler {
                                 .error(error)
                                 .build();
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        @ExceptionHandler(GeocodingNotFoundException.class)
+        public ResponseEntity<ApiResponse<?>> handleGeocodingNotFound(GeocodingNotFoundException ex) {
+                ErrorResponse error = ErrorResponse.builder()
+                                .code("GEOCODING_NOT_FOUND")
+                                .message(ex.getMessage())
+                                .build();
+
+                ApiResponse<?> response = ApiResponse.builder()
+                                .success(false)
+                                .data(null)
+                                .error(error)
+                                .build();
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_CONTENT).body(response);
         }
 
         @ExceptionHandler(Exception.class)

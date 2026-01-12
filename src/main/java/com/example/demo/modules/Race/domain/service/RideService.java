@@ -54,7 +54,7 @@ public class RideService {
 
                 RouteInfo route = distanceService.calculate(routeRequest);
 
-                Double price = priceService.calculatePrice(routeRequest);
+                Double price = priceService.calculatePrice(route);
 
                 RideEntity rideEntity = rideMapper.toEntity(passenger, pickupAddress, destinationAddress, price, route);
 

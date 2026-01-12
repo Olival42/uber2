@@ -20,8 +20,8 @@ public class RideMapper {
                 .pickupAddress(pickupAddress)
                 .destinationAddress(destinationAddress)
                 .price(price)
-                .distanceInKm(routeInfo.distanceKm())
-                .durationInMinutes(routeInfo.durationMinutes())
+                .distanceKm(routeInfo.distanceKm())
+                .durationMinutes(routeInfo.durationMinutes())
                 .startedAt(null)
                 .build();
     }
@@ -29,8 +29,8 @@ public class RideMapper {
     public ResponseRideDTO toResponseDTO(RideEntity rideEntity) {
         return ResponseRideDTO.builder()
                 .rideId(rideEntity.getId())
-                .distanceKm(DoubleFormat.round(rideEntity.getDistanceInKm(), 1))
-                .durationMinutes((int) Math.ceil(rideEntity.getDurationInMinutes()))
+                .distanceKm(DoubleFormat.round(rideEntity.getDistanceKm(), 1))
+                .durationMinutes((int) Math.ceil(rideEntity.getDurationMinutes()))
                 .price(DoubleFormat.round(rideEntity.getPrice(), 2))
                 .passengerId(rideEntity.getPassenger().getId())
                 .status(rideEntity.getStatus())

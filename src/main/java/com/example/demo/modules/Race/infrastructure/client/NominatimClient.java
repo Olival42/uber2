@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.example.demo.infrastructure.GeocodingNotFoundException;
 import com.example.demo.modules.Race.application.web.dto.CoordinateResponseDTO;
 import com.example.demo.modules.Race.domain.entity.AddressEntity;
 import com.example.demo.modules.Race.domain.service.util.AddressFormatter;
@@ -32,7 +33,7 @@ public class NominatimClient {
 
 
         if (response == null || response.length == 0) {
-            throw new RuntimeException("Error fetching coordinates: No results found for address");
+            throw new GeocodingNotFoundException("Error fetching coordinates: No results found for address");
         }
 
         return response[0];

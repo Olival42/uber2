@@ -61,10 +61,10 @@ public class RideEntity {
     private Double price;
 
     @Column(nullable = false)
-    private Double distanceInKm;
+    private Double distanceKm;
 
     @Column(nullable = false)
-    private Integer durationInMinutes;
+    private Integer durationMinutes;
 
     @Builder.Default
     private Instant requestedAt = Instant.now();
