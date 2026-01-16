@@ -2,7 +2,6 @@ package com.example.demo.modules.User.application.web.controller;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,13 +14,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.example.demo.modules.User.application.web.dto.AuthDTO;
 import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
 import com.example.demo.modules.User.application.web.dto.PassengerResponseDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
+import com.example.demo.modules.User.application.web.dto.TokenResponseDTO;
 import com.example.demo.modules.User.domain.service.PassengerService;
 import com.example.demo.modules.User.domain.service.UserService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 import com.example.demo.shared.ApiResponse;
+import com.example.demo.shared.mapper.ApiMapper;
 import com.example.demo.utils.CookieManager;
 
 import jakarta.validation.Valid;
@@ -43,24 +45,17 @@ public class PassengerController {
         private CookieManager cookieManager;
 
         @PostMapping("/register")
-        public ResponseEntity<ApiResponse<?>> postMethodName(@RequestBody @Valid RegisterPassengerDTO req,
+        public ResponseEntity<ApiResponse<?>> registerPassenger(@RequestBody @Valid RegisterPassengerDTO req,
                         UriComponentsBuilder uriBuilder) {
-                AuthResponseDTO authResponseDTO = userService.registerPassenger(req);
+                AuthDTO authResponseDTO = userService.registerPassenger(req);
 
                 URI url = uriBuilder.path("/passengers/{id}").buildAndExpand(authResponseDTO.user().getId())
                                 .toUri();
 
-                var tokens = Map.of(
-                                "accessToken", authResponseDTO.tokens().accessToken(),
-                                "expiresAt", authResponseDTO.tokens().expiresAt());
+                var tokens = new TokenResponseDTO(authResponseDTO.tokens().accessToken(),
+                                authResponseDTO.tokens().expiresAt());
 
-                ApiResponse<?> response = ApiResponse.builder()
-                                .success(true)
-                                .data(Map.of(
-                                                "user", authResponseDTO.user(),
-                                                "tokens", tokens))
-                                .error(null)
-                                .build();
+                var response = ApiMapper.sucess(new AuthResponseDTO(authResponseDTO.user(), tokens));
 
                 ResponseCookie cookie = cookieManager.createRefreshCookie(authResponseDTO.tokens().refreshToken(),
                                 jwtService.getExpiresAt(authResponseDTO.tokens().refreshToken())
@@ -73,11 +68,7 @@ public class PassengerController {
         public ResponseEntity<ApiResponse<?>> getMyProfile() {
                 PassengerResponseDTO passenger = passengerService.getPassengerById();
 
-                ApiResponse<?> response = ApiResponse.builder()
-                                .success(true)
-                                .data(Map.of("passenger", passenger))
-                                .error(null)
-                                .build();
+                var response = ApiMapper.sucess(passenger);
 
                 return ResponseEntity.ok(response);
         }

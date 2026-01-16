@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.infrastructure.exception.security.TokenRevokedException;
 import com.example.demo.modules.User.adapter.mapper.UserMapper;
-import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
+import com.example.demo.modules.User.application.web.dto.AuthDTO;
 import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
 import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
@@ -73,7 +73,7 @@ public class UserService {
     private EmailService emailService;
 
     @Transactional
-    public AuthResponseDTO registerPassenger(RegisterPassengerDTO req) {
+    public AuthDTO registerPassenger(RegisterPassengerDTO req) {
         PassengerEntity entity = mapper.toPassengerEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -83,11 +83,11 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(savedEntity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(savedEntity);
 
-        return new AuthResponseDTO(userResponse, tokens);
+        return new AuthDTO(userResponse, tokens);
     }
 
     @Transactional
-    public AuthResponseDTO registerDriver(RegisterDriverDTO req) {
+    public AuthDTO registerDriver(RegisterDriverDTO req) {
         DriverEntity entity = mapper.toDriverEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -97,10 +97,10 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(savedEntity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(savedEntity);
 
-        return new AuthResponseDTO(userResponse, tokens);
+        return new AuthDTO(userResponse, tokens);
     }
 
-    public AuthResponseDTO loginUser(UserLoginDTO req) {
+    public AuthDTO loginUser(UserLoginDTO req) {
         UsernamePasswordAuthenticationToken userNamePassword = new UsernamePasswordAuthenticationToken(req.getEmail(),
                 req.getPassword());
 
@@ -111,7 +111,7 @@ public class UserService {
         AuthTokenDTO tokens = generateTokens(entity);
         UserResponseDTO userResponse = mapper.toUserResponseDto(entity);
 
-        return new AuthResponseDTO(userResponse, tokens);
+        return new AuthDTO(userResponse, tokens);
     }
 
     public void logoutUser(String accessToken, String refreshToken) {

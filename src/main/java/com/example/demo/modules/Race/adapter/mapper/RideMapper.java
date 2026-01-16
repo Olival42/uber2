@@ -1,5 +1,7 @@
 package com.example.demo.modules.Race.adapter.mapper;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 import com.example.demo.modules.Race.application.web.dto.ResponseRideDTO;
@@ -27,6 +29,11 @@ public class RideMapper {
     }
 
     public ResponseRideDTO toResponseDTO(RideEntity rideEntity) {
+
+        UUID driverId = rideEntity.getDriver() != null
+                ? rideEntity.getDriver().getId()
+                : null;
+
         return ResponseRideDTO.builder()
                 .rideId(rideEntity.getId())
                 .distanceKm(DoubleFormat.round(rideEntity.getDistanceKm(), 1))
@@ -35,6 +42,12 @@ public class RideMapper {
                 .passengerId(rideEntity.getPassenger().getId())
                 .status(rideEntity.getStatus())
                 .requestedAt(rideEntity.getRequestedAt())
+                .driverId(driverId)
+                .acceptedAt(rideEntity.getAcceptedAt())
+                .startedAt(rideEntity.getStartedAt())
+                .finishedAt(rideEntity.getFinishedAt())
+                .cancelledAt(rideEntity.getCancelledAt())
+                .cancellationReason(rideEntity.getCancellationReason())
                 .build();
     }
 }

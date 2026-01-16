@@ -3,6 +3,7 @@ package com.example.demo.shared.email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -26,7 +27,8 @@ public class EmailService {
         sendHtmlEmail(to, "Reset Password", html);
     }
 
-    private void sendHtmlEmail(String to, String subject, String html) {
+    @Async("taskExecutor")
+    public void sendHtmlEmail(String to, String subject, String html) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");

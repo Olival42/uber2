@@ -1,5 +1,6 @@
 package com.example.demo.modules.Race.domain.entity;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -73,6 +74,9 @@ public class RideEntity {
     private Instant startedAt;
 
     @Column(nullable = true)
+    private Instant acceptedAt;
+
+    @Column(nullable = true)
     private Instant finishedAt;
 
     @Column(nullable = true)
@@ -80,4 +84,9 @@ public class RideEntity {
 
     @Column(nullable = true)
     private String cancellationReason;
+
+    public boolean isLateCancellation(Duration limit, Instant now) {
+        return acceptedAt != null &&
+                acceptedAt.plus(limit).isBefore(now);
+    }
 }
