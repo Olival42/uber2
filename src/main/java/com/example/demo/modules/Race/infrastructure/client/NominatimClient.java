@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.example.demo.infrastructure.exception.GeocodingNotFoundException;
-import com.example.demo.modules.Race.application.web.dto.CoordinateResponseDTO;
+import com.example.demo.modules.Race.application.web.dto.response.CoordinateResponseDTO;
 import com.example.demo.modules.Race.domain.entity.AddressEntity;
 import com.example.demo.modules.Race.domain.service.util.AddressFormatter;
 

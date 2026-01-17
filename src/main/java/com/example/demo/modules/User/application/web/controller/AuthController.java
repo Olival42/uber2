@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.infrastructure.exception.security.MissingTokenException;
 import com.example.demo.modules.User.application.web.dto.AuthDTO;
-import com.example.demo.modules.User.application.web.dto.AuthResponseDTO;
 import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
-import com.example.demo.modules.User.application.web.dto.TokenResponseDTO;
-import com.example.demo.modules.User.application.web.dto.UserForgotPasswordRequestDTO;
-import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
-import com.example.demo.modules.User.application.web.dto.UserResetPasswordRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.UserForgotPasswordRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.UserLoginRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.UserResetPasswordRequestDTO;
+import com.example.demo.modules.User.application.web.dto.response.AuthResponseDTO;
+import com.example.demo.modules.User.application.web.dto.response.TokenResponseDTO;
 import com.example.demo.modules.User.domain.service.UserService;
 import com.example.demo.modules.User.infrastructure.security.service.JwtService;
 import com.example.demo.shared.ApiResponse;
@@ -45,7 +45,7 @@ public class AuthController {
         private CookieManager cookieManager;
 
         @PostMapping("/login")
-        public ResponseEntity<ApiResponse<?>> login(@RequestBody @Valid UserLoginDTO req) {
+        public ResponseEntity<ApiResponse<?>> login(@RequestBody @Valid UserLoginRequestDTO req) {
                 AuthDTO authResponseDTO = userService.loginUser(req);
 
                 var tokens = new TokenResponseDTO(authResponseDTO.tokens().accessToken(),

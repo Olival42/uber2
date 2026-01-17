@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.modules.Race.adapter.mapper.RouteMapper;
 import com.example.demo.modules.Race.application.web.dto.RouteInfo;
-import com.example.demo.modules.Race.application.web.dto.RouteRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RouteRequestDTO;
 import com.example.demo.modules.Race.infrastructure.client.OpenRouteClient;
 
 @Service

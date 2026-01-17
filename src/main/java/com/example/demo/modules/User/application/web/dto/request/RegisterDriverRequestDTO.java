@@ -1,8 +1,10 @@
-package com.example.demo.modules.User.application.web.dto;
+package com.example.demo.modules.User.application.web.dto.request;
 
 import org.hibernate.validator.constraints.Length;
 
 import com.example.demo.modules.User.application.validation.anotation.ValidCnh;
+import com.example.demo.modules.User.application.validation.anotation.ValidPassword;
+import com.example.demo.modules.User.application.validation.anotation.ValidVehicleRegistration;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +16,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class RegisterDriverDTO {
+public class RegisterDriverRequestDTO {
 
     @NotBlank(message = "Email cannot be null")
     @Email(message = "Invalid email format")
@@ -22,7 +24,7 @@ public class RegisterDriverDTO {
 
     @Length(min = 8, message = "Password must be at least 8 characters long")
     @NotBlank(message = "Password cannot be null")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]+$", message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
+    @ValidPassword(message = "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character")
     private String password;
 
     @NotBlank(message = "Name cannot be null")
@@ -30,12 +32,12 @@ public class RegisterDriverDTO {
 
     @NotBlank(message = "CNH cannot be null")
     @Length(min = 11, message = "CNH must be at least 11 characters long")
-    @ValidCnh
+    @ValidCnh(message = "CNH invalid")
     private String cnh;
 
     @NotBlank(message = "Register of vehicle cannot be null")
     @Length(min = 7, message = "Register of vehicle must be at least 7 characters long")
-    @Pattern(regexp = "^[A-Z]{3}\\d[A-Z]\\d{2}$", message = "Register of vehicle invalid")
+    @ValidVehicleRegistration(message = "Register of vehicle invalid")
     private String vehicleRegistration;
 
     @NotBlank(message = "Model of vehicle cannot be null")
@@ -43,6 +45,7 @@ public class RegisterDriverDTO {
 
     @Length(min = 4, message = "Year of vehicle must be at least 4 characters long")
     @NotBlank(message = "Year of vehicle cannot be null")
+    @Pattern(regexp = "^\\d{4}$", message = "Year of vehicle invalid")
     private String yearVehicle;
 
     @NotBlank(message = "Color of vehicle cannot be null")

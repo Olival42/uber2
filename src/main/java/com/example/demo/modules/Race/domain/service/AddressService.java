@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.modules.Race.adapter.mapper.AddressMapper;
-import com.example.demo.modules.Race.application.web.dto.CoordinateResponseDTO;
-import com.example.demo.modules.Race.application.web.dto.RegisterAddressDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RegisterAddressRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.response.CoordinateResponseDTO;
 import com.example.demo.modules.Race.domain.entity.AddressEntity;
 import com.example.demo.modules.Race.domain.repository.IAddressRepository;
 import com.example.demo.modules.Race.infrastructure.client.NominatimClient;
@@ -25,7 +25,7 @@ public class AddressService {
     private NominatimClient nominatimClient;
 
     @Transactional
-    public AddressEntity registerAddress(RegisterAddressDTO req) {
+    public AddressEntity registerAddress(RegisterAddressRequestDTO req) {
 
         AddressEntity entity = addressMapper.toEntity(req);
 

@@ -17,10 +17,10 @@ import com.example.demo.infrastructure.exception.security.TokenRevokedException;
 import com.example.demo.modules.User.adapter.mapper.UserMapper;
 import com.example.demo.modules.User.application.web.dto.AuthDTO;
 import com.example.demo.modules.User.application.web.dto.AuthTokenDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
-import com.example.demo.modules.User.application.web.dto.UserLoginDTO;
-import com.example.demo.modules.User.application.web.dto.UserResponseDTO;
+import com.example.demo.modules.User.application.web.dto.request.RegisterDriverRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.RegisterPassengerRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.UserLoginRequestDTO;
+import com.example.demo.modules.User.application.web.dto.response.UserResponseDTO;
 import com.example.demo.modules.User.domain.entity.DriverEntity;
 import com.example.demo.modules.User.domain.entity.PassengerEntity;
 import com.example.demo.modules.User.domain.entity.ResetPasswordTokenEntity;
@@ -73,7 +73,7 @@ public class UserService {
     private EmailService emailService;
 
     @Transactional
-    public AuthDTO registerPassenger(RegisterPassengerDTO req) {
+    public AuthDTO registerPassenger(RegisterPassengerRequestDTO req) {
         PassengerEntity entity = mapper.toPassengerEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -87,7 +87,7 @@ public class UserService {
     }
 
     @Transactional
-    public AuthDTO registerDriver(RegisterDriverDTO req) {
+    public AuthDTO registerDriver(RegisterDriverRequestDTO req) {
         DriverEntity entity = mapper.toDriverEntity(req);
 
         entity.setPassword(encoder.encode(entity.getPassword()));
@@ -100,7 +100,7 @@ public class UserService {
         return new AuthDTO(userResponse, tokens);
     }
 
-    public AuthDTO loginUser(UserLoginDTO req) {
+    public AuthDTO loginUser(UserLoginRequestDTO req) {
         UsernamePasswordAuthenticationToken userNamePassword = new UsernamePasswordAuthenticationToken(req.getEmail(),
                 req.getPassword());
 

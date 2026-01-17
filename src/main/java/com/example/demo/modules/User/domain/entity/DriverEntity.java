@@ -1,8 +1,12 @@
 package com.example.demo.modules.User.domain.entity;
 
+import com.example.demo.modules.User.domain.enums.PixKeyType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,4 +36,11 @@ public class DriverEntity extends UserEntity{
 
     @Column(nullable = false)
     private String colorVehicle;
+
+    @Column(name = "pix_key", nullable = true, unique = true)
+    private String pixKey;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pix_key_type", nullable = true)
+    private PixKeyType pixKeyType;
 }

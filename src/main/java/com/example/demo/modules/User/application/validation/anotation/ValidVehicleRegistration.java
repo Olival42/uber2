@@ -5,17 +5,17 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import com.example.demo.modules.User.application.validation.validator.CpfConstraintValidator;
+import com.example.demo.modules.User.application.validation.validator.VehicleRegistrationConstraintValidator;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-@Constraint(validatedBy = CpfConstraintValidator.class)
+@Constraint(validatedBy =  VehicleRegistrationConstraintValidator.class)
 @Target({ ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ValidCpf {
+public @interface ValidVehicleRegistration {
 
-    String message() default "CPF invalid";
+    String message() default "Vehicle registration invalid";
 
 	Class<?>[] groups() default {};
 

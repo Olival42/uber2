@@ -1,4 +1,4 @@
-package com.example.demo.modules.Race.application.web.dto;
+package com.example.demo.modules.Race.application.web.dto.request;
 
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AcceptRideDTO {
+public class AcceptRideRequestDTO {
 
     @NotNull(message = "Driver ID is required")
     private UUID driverId;

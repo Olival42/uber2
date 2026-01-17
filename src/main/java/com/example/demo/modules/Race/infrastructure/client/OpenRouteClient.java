@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.example.demo.infrastructure.exception.RouteNotFoundException;
-import com.example.demo.modules.Race.application.web.dto.RouteRequestDTO;
-import com.example.demo.modules.Race.application.web.dto.RouteResponseDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RouteRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.response.RouteResponseDTO;
 
 @Component
 public class OpenRouteClient {

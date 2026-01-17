@@ -21,12 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.infrastructure.exception.BusinessRuleException;
 import com.example.demo.modules.Race.adapter.mapper.RideMapper;
 import com.example.demo.modules.Race.adapter.mapper.RouteRequestMapper;
-import com.example.demo.modules.Race.application.web.dto.AcceptRideDTO;
-import com.example.demo.modules.Race.application.web.dto.CancelRideDTO;
-import com.example.demo.modules.Race.application.web.dto.RegisterRideDTO;
-import com.example.demo.modules.Race.application.web.dto.ResponseRideDTO;
 import com.example.demo.modules.Race.application.web.dto.RouteInfo;
-import com.example.demo.modules.Race.application.web.dto.RouteRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.AcceptRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.CancelRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RegisterRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RouteRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.response.ResponseRideDTO;
 import com.example.demo.modules.Race.domain.entity.AddressEntity;
 import com.example.demo.modules.Race.domain.entity.RideEntity;
 import com.example.demo.modules.Race.domain.enums.StatusRide;
@@ -89,7 +89,7 @@ public class RideService {
         private Clock clock;
 
         @Transactional
-        public ResponseRideDTO requestRide(RegisterRideDTO req) {
+        public ResponseRideDTO requestRide(RegisterRideRequestDTO req) {
 
                 PassengerEntity passenger = passengerRepository.findById(req.getPassengerId())
                                 .orElseThrow(() -> new EntityNotFoundException("Passenger not found"));
@@ -113,7 +113,7 @@ public class RideService {
         }
 
         @Transactional
-        public ResponseRideDTO acceptRide(UUID rideId, AcceptRideDTO req) {
+        public ResponseRideDTO acceptRide(UUID rideId, AcceptRideRequestDTO req) {
 
                 long count = rideRepository.countByDriverIdAndStatusIn(req.getDriverId(), DRIVER_ACTIVE_STATUSES);
 
@@ -144,7 +144,7 @@ public class RideService {
         }
 
         @Transactional
-        public void cancelRide(UUID rideId, CancelRideDTO req) {
+        public void cancelRide(UUID rideId, CancelRideRequestDTO req) {
 
                 RideEntity rideEntity = rideRepository.findByIdWithLock(rideId)
                                 .orElseThrow(() -> new EntityNotFoundException("Ride not found"));

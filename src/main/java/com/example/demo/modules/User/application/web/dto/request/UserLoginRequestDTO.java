@@ -1,4 +1,4 @@
-package com.example.demo.modules.User.application.web.dto;
+package com.example.demo.modules.User.application.web.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class UserLoginDTO {
+public class UserLoginRequestDTO {
 
     @NotBlank(message = "Email cannot be null")
     @Email(message = "Invalid email format")

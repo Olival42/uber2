@@ -3,7 +3,7 @@ package com.example.demo.modules.Race.adapter.mapper;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.modules.Race.application.web.dto.DistanceResult;
-import com.example.demo.modules.Race.application.web.dto.RouteResponseDTO;
+import com.example.demo.modules.Race.application.web.dto.response.RouteResponseDTO;
 
 @Component
 public class RouteMapper {

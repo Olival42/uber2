@@ -1,4 +1,4 @@
-package com.example.demo.modules.Race.application.web.dto;
+package com.example.demo.modules.Race.application.web.dto.response;
 
 import java.time.Instant;
 import java.util.UUID;

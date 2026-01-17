@@ -4,11 +4,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-import com.example.demo.modules.User.application.web.dto.DriverResponseDTO;
-import com.example.demo.modules.User.application.web.dto.PassengerResponseDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterDriverDTO;
-import com.example.demo.modules.User.application.web.dto.RegisterPassengerDTO;
-import com.example.demo.modules.User.application.web.dto.UserResponseDTO;
+import com.example.demo.modules.User.application.web.dto.request.RegisterDriverRequestDTO;
+import com.example.demo.modules.User.application.web.dto.request.RegisterPassengerRequestDTO;
+import com.example.demo.modules.User.application.web.dto.response.DriverResponseDTO;
+import com.example.demo.modules.User.application.web.dto.response.PassengerResponseDTO;
+import com.example.demo.modules.User.application.web.dto.response.UserResponseDTO;
 import com.example.demo.modules.User.domain.entity.DriverEntity;
 import com.example.demo.modules.User.domain.entity.PassengerEntity;
 import com.example.demo.modules.User.domain.entity.UserEntity;
@@ -17,14 +17,16 @@ import com.example.demo.modules.User.domain.entity.UserEntity;
 public interface UserMapper {
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "pixKey", ignore = true)
+    @Mapping(target = "pixKeyType", ignore = true)
     @Mapping(target = "role", constant = "DRIVER")
     @Mapping(target = "active", constant = "true")
-    DriverEntity toDriverEntity(RegisterDriverDTO dto);
+    DriverEntity toDriverEntity(RegisterDriverRequestDTO dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", constant = "PASSENGER")
     @Mapping(target = "active", constant = "true")
-    PassengerEntity toPassengerEntity(RegisterPassengerDTO dto);
+    PassengerEntity toPassengerEntity(RegisterPassengerRequestDTO dto);
 
     UserResponseDTO toUserResponseDto(UserEntity entity);
 

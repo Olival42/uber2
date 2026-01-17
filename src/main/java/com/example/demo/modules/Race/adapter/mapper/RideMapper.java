@@ -4,8 +4,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
-import com.example.demo.modules.Race.application.web.dto.ResponseRideDTO;
 import com.example.demo.modules.Race.application.web.dto.RouteInfo;
+import com.example.demo.modules.Race.application.web.dto.response.ResponseRideDTO;
 import com.example.demo.modules.Race.domain.entity.AddressEntity;
 import com.example.demo.modules.Race.domain.entity.RideEntity;
 import com.example.demo.modules.User.domain.entity.PassengerEntity;

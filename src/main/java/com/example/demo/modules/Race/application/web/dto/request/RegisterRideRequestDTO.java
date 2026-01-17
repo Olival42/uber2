@@ -1,4 +1,4 @@
-package com.example.demo.modules.Race.application.web.dto;
+package com.example.demo.modules.Race.application.web.dto.request;
 
 import java.util.UUID;
 
@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterRideDTO {
+public class RegisterRideRequestDTO {
 
     @NotNull(message = "Passenger ID is required")
     private UUID passengerId;
 
     @NotNull(message = "Pickup address is required")
-    private RegisterAddressDTO pickupAddress;
+    private RegisterAddressRequestDTO pickupAddress;
 
     @NotNull(message = "Destination address is required")
-    private RegisterAddressDTO destinationAddress;
+    private RegisterAddressRequestDTO destinationAddress;
 }

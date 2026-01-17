@@ -1,4 +1,4 @@
-package com.example.demo.modules.Race.application.web.dto;
+package com.example.demo.modules.Race.application.web.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterAddressDTO {
+public class RegisterAddressRequestDTO {
 
     @NotBlank(message = "Street is required")
     private String street;

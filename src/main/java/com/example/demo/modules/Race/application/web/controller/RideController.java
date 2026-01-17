@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.example.demo.modules.Race.application.web.dto.AcceptRideDTO;
-import com.example.demo.modules.Race.application.web.dto.CancelRideDTO;
-import com.example.demo.modules.Race.application.web.dto.RegisterRideDTO;
-import com.example.demo.modules.Race.application.web.dto.ResponseRideDTO;
+import com.example.demo.modules.Race.application.web.dto.request.AcceptRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.CancelRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.request.RegisterRideRequestDTO;
+import com.example.demo.modules.Race.application.web.dto.response.ResponseRideDTO;
 import com.example.demo.modules.Race.domain.enums.StatusRide;
 import com.example.demo.modules.Race.domain.service.RideService;
 import com.example.demo.shared.ApiResponse;
@@ -40,7 +40,7 @@ public class RideController {
 
         @PostMapping("/request")
         @PreAuthorize("hasRole('PASSENGER')")
-        public ResponseEntity<ApiResponse<?>> requestRide(@RequestBody @Valid RegisterRideDTO req,
+        public ResponseEntity<ApiResponse<?>> requestRide(@RequestBody @Valid RegisterRideRequestDTO req,
                         UriComponentsBuilder uri) {
                 ResponseRideDTO response = rideService.requestRide(req);
 
@@ -54,7 +54,7 @@ public class RideController {
         @PatchMapping("/accept/{rideId}")
         @PreAuthorize("hasRole('DRIVER')")
         public ResponseEntity<ApiResponse<?>> acceptRide(@PathVariable UUID rideId,
-                        @RequestBody @Valid AcceptRideDTO req) {
+                        @RequestBody @Valid AcceptRideRequestDTO req) {
 
                 ResponseRideDTO response = rideService.acceptRide(rideId, req);
 
@@ -66,7 +66,7 @@ public class RideController {
         @DeleteMapping("/cancel/{rideId}")
         @PreAuthorize("hasAnyRole('PASSENGER', 'DRIVER')")
         public ResponseEntity<ApiResponse<?>> cancelRide(@PathVariable UUID rideId,
-                        @RequestBody @Valid CancelRideDTO req) {
+                        @RequestBody @Valid CancelRideRequestDTO req) {
 
                 rideService.cancelRide(rideId, req);
 
