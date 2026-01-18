@@ -31,6 +31,8 @@ public interface IRideRepository extends JpaRepository<RideEntity, UUID>, JpaSpe
     @Query("SELECT r FROM RideEntity r WHERE r.driver.id = :driverId AND r.status = :status ORDER BY r.requestedAt ASC")
     Optional<RideEntity> findFirstByDriverIdAndStatusOrderByRequestedAtAsc(UUID driverId, StatusRide status);
 
+    Optional<RideEntity> findFirstByDriverIdOrderByFinishedAtDesc(UUID driverId);
+
     @Query("SELECT COUNT(r) FROM RideEntity r WHERE r.driver.id = :driverId AND r.status IN :status")
     long countByDriverIdAndStatusIn(UUID driverId, List<StatusRide> status);
 
